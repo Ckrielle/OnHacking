@@ -3,7 +3,7 @@
 
 ## Local File Inclusion
 ### Basic Info
-Local File Inclusion (LFI) occurs (as most do) because of user-supplied input without proper validation. More specifically,it is the process of including file 
+Local File Inclusion (LFI) occurs (as most do) because of user-supplied input without proper validation. More specifically,it is the process of including file
 that are on the server through vulnerable inclusion procedure. For example when a page receives the path of a file as input and it doesn't sanitize it, allowing
 directory traversal.
 
@@ -55,4 +55,17 @@ http://example.com?lang=/../../../../../../../../../etc/passwd
 
 
 
+## GENERAL TIPS 'N TRICKS
 If a website does CURL requests and you can specify not only the website, but also the protocol, you can use the file protocol to access any file on the server
+
+If a website has a .git directory, we can try and download it with
+
+```
+wget -r --no-parent --connect-timeout=5 http://example.com/.git/
+```
+
+If we gat a 403, we can try [GitTools](https://github.com/internetwache/GitTools)
+
+```
+./gitdumper.sh https://example.com/.git/ out
+```
