@@ -73,3 +73,67 @@ grep -r <pattern-here> ./*
 ```
 For the pattern we can use words like password, database, username, and once
 we find an interesting one, we can search the file from which it came from.
+
+
+## Privilege Escalation
+
+### Enumeration
+
+#### System Enumeration
+`uname` is a linux command that prints system information. Different flags can be used, but for convenience sake use -a for all. Different files that can also give system information are */proc/version* and */etc/issue*
+To get information on CPU architecture, run `lscpu`. Informations like sockets and core counts can determine whether exploits can be used or not.
+To list services, run `ps aux`.
+
+#### User Enumeration
+Two commands to get the current user are
+```
+whoami
+id
+```
+Of these, id is better because it gives more information about the gid of the user, and the groups he belongs in.
+To get the commands the user can run as root, we run `sudo -l`
+To get all the users in a system, we can read the */etc/passwd* file. We can get them with
+`cut /etc/passwd -d : -f 1` (yup you don't have to cat and pipe)
+Check the permissions of some files, like */etc/passwd* and */etc/groups*
+Run ``history`` to get previous commands
+
+#### Network Enumeration
+To identify open ports and communication between the host system and other machines, run `netstat -ano`
+
+### Exploitation
+
+#### Kernel
+To identify kernel version, run `uname -a` as listed above, and paste the version to google. Another way is through [linux exploit suggester](https://github.com/mzet-/linux-exploit-suggester), which automatically identifies CVEs, so it can find them. Below are some interesting links on linux kernel exploits:
+-https://chao-tic.github.io/blog/2017/05/24/dirty-cow
+-https://github.com/xairy/linux-kernel-exploitation
+
+#### Passwords
+To search for files with passwords potentially in them, execute the below commands
+```
+grep --color=auto -rin PASSWORD / 2> /dev/null
+find / -type f -exec grep -i -I "PASSWORD" {} /dev/null \;
+```
+We can modify them based on what we want. We can change the path from which they start (e.g. '/', '.', '/var/www/html;, '/opt', ...) or the pattern they search for (PASSWORD, PASSWORD=, PASS=, ...)
+To automate the process we can use tools like linpeas.
+**NOTE!** We can also search for passwords on binary files with `strings`
+
+#### File Permissions
+
+Depending on the OS the **/etc/passwd** & **/etc/shadow** files may be different. We can view their permission with these commands
+```
+#Passwd equivalent files
+ls -l /etc/passwd /etc/pwd.db /etc/master.passwd /etc/group 2>/dev/null
+#Shadow equivalent files
+ls -l /etc/shadow /etc/shadow- /etc/shadow~ /etc/gshadow /etc/gshadow- /etc/master.passwd /etc/spwd.db /etc/security/opasswd 2>/dev/null
+```
+The important things to watch out is if **/etc/passwd** is writeable for a user or group we have access to, and if **/etc/shadow** is similarly writeable.
+If /etc/passwd is writeable, we can add our own user, and we can give him root permissions by exploiting the [/etc/passwd syntax](https://www.cyberciti.biz/faq/understanding-etcpasswd-file-format/). We definitely want to give him a uid and gid of 0, and **/root** as home dir. So we get this line `hacker:HASH_HERE:0:0:Hacker:/root:/bin/bash`. We can use one of the below lines to generate a valid hash
+```
+openssl passwd -1 -salt pass pass
+mkpasswd -m SHA-512 pass
+python2 -c 'import crypt; print crypt.crypt("pass", "$6$pass")'
+```
+So we get the line `hacker:$1$hacker$TzyKlv0/R/c28R.GAeLw.1:0:0:Hacker:/root:/bin/bash`
+We can also add a line with no password hash `echo 'hacker::0:0:Hacker:/root/bin/bash`, remove the x from the root user, or change our user's uid, gid, and home fields. Be careful however as this decreases the security of the system
+
+If **/etc/shadow** is readable, then we have the hashes of the users and we can easily crack them with **hashcat** or **JtR**. View [this](https://null-byte.wonderhowto.com/how-to/crack-shadow-hashes-after-getting-root-linux-system-0186386/) link to learn more on that. To identify the hash mode for the tools, use [hashid](https://github.com/psypanda/hashID)
