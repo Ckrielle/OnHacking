@@ -137,3 +137,9 @@ So we get the line `hacker:$1$hacker$TzyKlv0/R/c28R.GAeLw.1:0:0:Hacker:/root:/bi
 We can also add a line with no password hash `echo 'hacker::0:0:Hacker:/root/bin/bash`, remove the x from the root user, or change our user's uid, gid, and home fields. Be careful however as this decreases the security of the system
 
 If **/etc/shadow** is readable, then we have the hashes of the users and we can easily crack them with **hashcat** or **JtR**. View [this](https://null-byte.wonderhowto.com/how-to/crack-shadow-hashes-after-getting-root-linux-system-0186386/) link to learn more on that. To identify the hash mode for the tools, use [hashid](https://github.com/psypanda/hashID)
+
+#### Sudo Shell Escaping
+
+One of the most important commands when privescing is `sudo -l`, showing the list of allowed commands for the invoking user on the host. The best way to exploit the binaries shown is with [gtfobins](https://gtfobins.github.io/). If something doesn't appear there, then we google it.
+
+
