@@ -9,6 +9,46 @@ But first, some
 
 # Python Basics
 
+Python is generally the goto language for Crypto mainly because of it's overall strong points. Multiple libraries,
+
+```
+# Integers & ASCII
+>>> ord('A')
+65
+>>> chr(65)
+'A'
+
+# List of int ASCII values
+>>> [ord(i) for i in word]
+
+# Integers & Hex
+>>> hex(13)
+'0xd'
+>>> int('d', 16)
+13
+>>> 0xd
+13
+
+# Strings & Bytes
+>>> bytes('Hello', 'utf-8')
+b'Hello'
+>>> b'Hello'.decode('utf-8')
+
+# Bytes & Hex
+>>> b'Hello'.hex()
+'48656c6c6f'
+>>> bytes.fromhex('48656c6c6f')
+b'Hello'
+
+# Long & Bytes
+>>> from Crypto.Util.number import long_to_bytes, bytes_to_long
+>>> bytes_to_long(b'Hello')
+310939249775
+>>> long_to_bytes(310939249775)
+b'Hello'
+
+
+```
 
 # Classic Cryptography
 Classic Cryptography isn't used today, it's mostly kept for brain puzzles. You can easily find them in CTFs.

@@ -141,5 +141,3 @@ If **/etc/shadow** is readable, then we have the hashes of the users and we can 
 #### Sudo Shell Escaping
 
 One of the most important commands when privescing is `sudo -l`, showing the list of allowed commands for the invoking user on the host. The best way to exploit the binaries shown is with [gtfobins](https://gtfobins.github.io/). If something doesn't appear there, then we google it.
-
-
